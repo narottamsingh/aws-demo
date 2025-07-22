@@ -3,16 +3,18 @@ name: Deploy JAR to S3
 on:
   push:
     branches:
-      - main
+      - main # Trigger this action on pushes to the main branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
+      # Step 2: Setup AWS CLI
       - name: Setup AWS CLI
         uses: aws-actions/configure-aws-cli@v2
         with:
@@ -20,8 +22,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      # Step 3: Build the application
       - name: Build Application
         run: ./gradlew build
 
+      # Step 4: Upload the JAR to S3
       - name: Upload JAR to S3
         run: aws s3 cp build/libs/aws-demo-0.0.1-SNAPSHOT.jar s3://narottamsingh/load-balanced-app.jar
